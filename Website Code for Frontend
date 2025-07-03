@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FamilyConnect - Safe Location Sharing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .map-container {
+            height: 400px;
+            background-color: #e5e7eb;
+            border-radius: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .map-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #6b7280;
+        }
+        .consent-checkbox:checked {
+            background-color: #3b82f6;
+        }
+        .member-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .logo-container {
+            text-align: center;
+            padding: 2rem;
+        }
+        .logo-mark {
+            display: inline-block;
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        .family-icon {
+            display: flex;
+            position: relative;
+        }
+        .person {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 0 5px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .person:before {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.2;
+        }
+        .person:after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        .connect-line {
+            position: absolute;
+            height: 4px;
+            width: 100%;
+            background: linear-gradient(90deg, #4a6cf7, #8c43ff);
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: -1;
+            border-radius: 2px;
+        }
+        .person-1 {
+            color: #4a6cf7;
+        }
+        .person-2 {
+            color: #6a5acd;
+        }
+        .person-3 {
+            color: #8c43ff;
+        }
+        .person-4 {
+            color: #b65cff;
+        }
+        .logo-text {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #4a6cf7, #8c43ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+        .tagline {
+            color: #6c757d;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+        #room {
+            color: black;
+            width: 70px;
+            border: #6b7280 1px solid;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div class="flex items-center">
+                <div class="logo-container">
+                    <div class="logo-mark">
+                        <div class="family-icon">
+                            <div class="person person-1"></div>
+                            <div class="person person-2"></div>
+                            <div class="person person-3"></div>
+                            <div class="person person-4"></div>
+                            <div class="connect-line"></div>
+                        </div>
+                    </div>
+                    <div class="logo-text">FamilyConnect</div>
+                    <div class="tagline">Bringing families closer</div>
+                </div>
+            </div>
+            <nav>
+                <ul class="flex space-x-6">
+                    <li><a href="#" class="text-gray-600 hover:text-blue-600">Home</a></li>
+                    <li><a href="#" class="text-gray-600 hover:text-blue-600">Settings</a></li>
+                    <li><a href="#" class="text-gray-600 hover:text-blue-600">Help</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Consent Banner -->
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-700">
+                            FamilyConnect respects your privacy. Location sharing requires explicit consent from each family member.
+                            You can revoke access at any time in Settings.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Family Members Section -->
+            <section class="mb-10">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Your Family Circle</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Family Member Card 1 -->
+                    <div class="member-card bg-white p-4 rounded-lg shadow transition duration-300">
+                        <div class="flex items-center mb-3">
+                            <img src="https://placehold.co/60x60" alt="Profile picture of mother with dark hair and glasses in her 40s" class="rounded-full mr-2" />
+                            <div>
+                                <h3 class="font-medium">Mom</h3>
+                                <p class="text-xs text-gray-500">Last seen: 10 min ago</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-green-600"><i class="fas fa-circle mr-1 text-xs"></i> Sharing</span>
+                            <a href="#" class="text-blue-500 text-sm hover:underline">View</a>
+                        </div>
+                    </div>
+
+                    <!-- Family Member Card 2 -->
+                    <div class="member-card bg-white p-4 rounded-lg shadow transition duration-300">
+                        <div class="flex items-center mb-3">
+                            <img src="https://placehold.co/60x60" alt="Profile picture of father with short gray hair smiling in his 50s" class="rounded-full mr-2" />
+                            <div>
+                                <h3 class="font-medium">Dad</h3>
+                                <p class="text-xs text-gray-500">Last seen: 30 min ago</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-green-600"><i class="fas fa-circle mr-1 text-xs"></i> Sharing</span>
+                            <a href="#" class="text-blue-500 text-sm hover:underline">View</a>
+                        </div>
+                    </div>
+
+                    <!-- Family Member Card 3 -->
+                    <div class="member-card bg-white p-4 rounded-lg shadow transition duration-300">
+                        <div class="flex items-center mb-3">
+                            <img src="https://placehold.co/60x60" alt="Profile picture of teenage daughter with ponytail and pink sweater" class="rounded-full mr-2" />
+                            <div>
+                                <h3 class="font-medium">Emily</h3>
+                                <p class="text-xs text-gray-500">Last seen: 5 min ago</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-green-600"><i class="fas fa-circle mr-1 text-xs"></i> Sharing</span>
+                            <a href="#" class="text-blue-500 text-sm hover:underline">View</a>
+                        </div>
+                    </div>
+
+                    <!-- Add New Member Card -->
+                    <div class="member-card bg-white p-4 rounded-lg shadow transition duration-300 border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-blue-400">
+                        <button class="flex flex-col items-center text-blue-500">
+                            <i class="fas fa-plus-circle text-2xl mb-1"></i>
+                            <span class="text-sm">Add Family Member</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Photo Upload Section -->
+            <section class="mb-10">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Upload Profile Photo</h2>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Choose a profile photo:</label>
+                    <input type="file" accept="image/*" class="border border-gray-300 rounded-md p-2 w-full" />
+                </div>
+                <div id="room"><button>UPLOAD</button></div>
+            </section>
+
+            <!-- Map Section -->
+            <section class="mb-10">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Family Location</h2>
+                <div class="map-container shadow-lg">
+                    <div class="map-placeholder">
+                        <i class="fas fa-map-marked-alt text-5xl mb-3 text-gray-400"></i>
+                        <p class="text-lg">Family locations will appear here</p>
+                        <p class="text-sm mt-2">Each family member must consent to location sharing</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Invitation Section -->
+            <section class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Invite Family Members</h2>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Invitation Link</label>
+                    <div class="flex">
+                        <input type="text" class="flex-grow px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-1 focus:ring-blue-500" value="https://familyconnect.app/invite/7x3h9p" readonly>
+                        <button class="bg-blue-500 text-white px-4 py-2 rounded-r-md hover:bg-blue-600 transition">
+                            Copy
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Or send via message</label>
+                    <div class="flex">
+                        <input type="tel" class="flex-grow px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Enter phone number">
+                        <button class="bg-blue-500 text-white px-4 py-2 rounded-r-md hover:bg-blue-600 transition">
+                            Send
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <input id="consent-check" type="checkbox" class="consent-checkbox h-4 w-4 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="consent-check" class="ml-2 text-sm text-gray-700">
+                        I confirm I have permission to share this invitation with my family members
+                    </label>
+                </div>
+            </section>
+
+            <!-- Privacy Information -->
+            <section class="mt-6 bg-gray-50 p-4 rounded-lg">
+                <h3 class="font-medium text-gray-800 mb-2">About Our Privacy Policy</h3>
+                <p class="text-xs text-gray-600 mb-2">
+                    FamilyConnect prioritizes your privacy. Location data is encrypted and only shared with explicitly invited family members. You can revoke access at any time.
+                </p>
+                <a href="#" class="text-xs text-blue-500 hover:underline">Read our complete privacy policy</a>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-10 py-6">
+        <div class="container mx-auto px-4 text-center text-sm text-gray-500">
+            <p>© 2025 FamilyConnect Developed By Rajat Kumar</p>
+            <p>All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Simulated functionality for demo purposes
+        document.addEventListener('DOMContentLoaded', function() {
+            // Copy invitation link
+            document.querySelectorAll('button').forEach(button => {
+                if (button.textContent.trim() === 'Copy') {
+                    button.addEventListener('click', function() {
+                        const input = this.previousElementSibling;
+                        input.select();
+                        document.execCommand('copy');
+                        input.blur();
+                        
+                        // Show feedback
+                        const originalText = this.textContent;
+                        this.textContent = 'Copied!';
+                        this.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                        this.classList.add('bg-green-500', 'hover:bg-green-600');
+                        
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                            this.classList.remove('bg-green-500', 'hover:bg-green-600');
+                            this.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                        }, 2000);
+                    });
+                }
+            });
+
+            // Send invitation via SMS (simulated)
+            document.querySelectorAll('button').forEach(button => {
+                if (button.textContent.trim() === 'Send') {
+                    button.addEventListener('click', function() {
+                        const phoneInput = this.previousElementSibling;
+                        const consentCheck = document.getElementById('consent-check');
+                        
+                        if (!phoneInput.value) {
+                            alert('Please enter a phone number');
+                            return;
+                        }
+                        
+                        if (!consentCheck.checked) {
+                            alert('Please confirm you have permission to send this invitation');
+                            return;
+                        }
+                        
+                        // Simulate sending
+                        const originalText = this.textContent;
+                        this.textContent = 'Sending...';
+                        this.disabled = true;
+                        
+                        setTimeout(() => {
+                            this.textContent = 'Sent!';
+                            this.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                            this.classList.add('bg-green-500', 'hover:bg-green-600');
+                            
+                            setTimeout(() => {
+                                this.textContent = originalText;
+                                this.disabled = false;
+                                this.classList.remove('bg-green-500', 'hover:bg-green-600');
+                                this.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                                phoneInput.value = '';
+                            }, 2000);
+                        }, 1500);
+                    });
+                }
+            });
+
+            // View family member location
+            document.querySelectorAll('a[href="#"]').forEach(link => {
+                if (link.textContent.trim() === 'View') {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        alert('This demo would show the location of the selected family member. In a real implementation, this would display their location on the map with proper consent.');
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
